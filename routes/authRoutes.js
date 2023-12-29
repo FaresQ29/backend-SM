@@ -47,7 +47,13 @@ router.post("/register", async (req, res, next) => {
     //create hashed password
     const salt = await bcrypt.genSalt(12);
     const passwordHash = await bcrypt.hash(password, salt);
-    const formObj = { username, password: passwordHash };
+
+    const formObj = Object.assign(
+      { username, password: passwordHash },
+      defaultRegisterValues
+    );
+
+    console.log(formObj);
     if (email) {
       formObj.email = email;
     }
@@ -125,4 +131,16 @@ router.get("/verify", checkToken, async (req, res, next) => {
   }
 });
 
-module.exports = router;
+const defaultRegisterValues = {
+  userDetails: {
+    firstName: "",
+    lastName: "",
+    about: "",
+    location: null,
+    dateOfBirth: "",
+    occupation: "",
+    avatar: null,
+  },
+};
+
+module.exports = { authRoutes: router };

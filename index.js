@@ -14,9 +14,13 @@ app.get("/test", (req, res) => {
 });
 
 //Auth Routes
-const authRoutes = require("./routes/authRoutes");
+const { authRoutes } = require("./routes/authRoutes");
 app.use("/auth", authRoutes);
 
 //User Routes
-const userRoutes = require("./routes/userRoutes");
+const { userRoutes } = require("./routes/userRoutes");
 app.use("/user", userRoutes);
+
+//Image Routes
+const { imageRoutes } = require("./routes/imageRoutes");
+app.use("/image", imageRoutes);

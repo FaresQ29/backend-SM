@@ -1,8 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/user.model");
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
 const { url } = require("../config.js");
 const checkToken = require("../middleware/checkToken");
 
@@ -11,11 +9,22 @@ const checkToken = require("../middleware/checkToken");
 router.post("/find-username", async (req, res) => {
   const { username } = req.body;
   try {
-    const response = await User.findOne({ username });
+    const response = await User.findOne({ username }, "username");
+    console.log(response);
     res.status(200).json(response);
   } catch (err) {
     res.status(503);
   }
 });
 
-module.exports = router;
+router.put("/edit-user/:id", checkToken, async (req, res) => {
+  const id = req.params.id;
+
+  try {
+    const updatedUser = await User.findByIdAndUpdate(id, req.body);
+    res.status(201).json(updatedUser);
+  } catch (err) {
+    res.status(500).json({ err });
+  }
+});
+module.exports = { userRoutes: router };
