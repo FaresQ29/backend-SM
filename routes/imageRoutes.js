@@ -18,6 +18,8 @@ cloudinary.config({
   api_secret: process.env.C_API_SECRET,
   secure: true,
 });
+
+// upload image to cloudinary server && delete
 router.post(
   "/upload-avatar-server",
   [upload.single("my_file"), checkToken],
@@ -32,6 +34,18 @@ router.post(
     }
   }
 );
+router.post("/delete-avatar-server", checkToken, async (req, res) => {
+  const { publicId } = req.body;
+
+  try {
+    const cloudRes = deleteImage(publicId);
+    res.status(200).json({ msg: "Successfully removed image from server" });
+  } catch (err) {
+    res.status(500).json({ msg: "Could not remove image from server" });
+  }
+});
+
+// add/remove cloudinary secure url to user's data in mongo db
 router.post("/upload-avatar-user", checkToken, async (req, res) => {
   try {
     const response = await User.findByIdAndUpdate(req.body._id, req.body);
@@ -41,7 +55,17 @@ router.post("/upload-avatar-user", checkToken, async (req, res) => {
     console.log(err);
   }
 });
+router.post("/delete-avatar-user", checkToken, async (req, res) => {
+  try {
+    const response = await User.findByIdAndUpdate(req.body._id, req.body);
+    console.log(response);
+    res.status(200).json(response);
+  } catch (err) {
+    console.log(err);
+  }
+});
 
+//the actual upload and remove to cloudinary functions
 async function uploadImage(imagePath) {
   const options = {
     use_filename: true,
@@ -53,6 +77,15 @@ async function uploadImage(imagePath) {
     if (result && result.secure_url) {
       return result;
     }
+  } catch (error) {
+    console.error(error);
+  }
+}
+
+async function deleteImage(publicId) {
+  try {
+    const result = await cloudinary.uploader.destroy(publicId);
+    console.log("succesfully removed image from cloudinary");
   } catch (error) {
     console.error(error);
   }
