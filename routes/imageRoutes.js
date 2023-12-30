@@ -30,7 +30,9 @@ router.post(
       const cldRes = await uploadImage(dataURI);
       res.json({ url: cldRes.secure_url, public_id: cldRes.public_id });
     } catch (err) {
-      console.log(err);
+      res
+        .status(500)
+        .json({ msg: "Could not upload image to cloudinary server" });
     }
   }
 );
@@ -52,7 +54,7 @@ router.post("/upload-avatar-user", checkToken, async (req, res) => {
     console.log(response);
     res.status(200).json(response);
   } catch (err) {
-    console.log(err);
+    res.status(500).json({ msg: "Could not upload image src to mongodb" });
   }
 });
 router.post("/delete-avatar-user", checkToken, async (req, res) => {
@@ -61,7 +63,7 @@ router.post("/delete-avatar-user", checkToken, async (req, res) => {
     console.log(response);
     res.status(200).json(response);
   } catch (err) {
-    console.log(err);
+    res.status(500).json({ msg: "Could not delete image source from mongodb" });
   }
 });
 
