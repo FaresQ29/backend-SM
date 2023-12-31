@@ -6,6 +6,10 @@ const userSchema = new Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   email: { type: String, unique: true },
+  friends: {
+    friendList: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    friendRequests: [{ type: Schema.Types.ObjectId, ref: "User" }],
+  },
   userDetails: {
     firstName: String,
     lastName: String,

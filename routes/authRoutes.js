@@ -50,7 +50,8 @@ router.post("/register", async (req, res, next) => {
 
     const formObj = Object.assign(
       { username, password: passwordHash },
-      defaultRegisterValues
+      defaultRegisterValues,
+      friendDefaultValues
     );
 
     console.log(formObj);
@@ -142,5 +143,10 @@ const defaultRegisterValues = {
     avatar: null,
   },
 };
-
+const friendDefaultValues = {
+  friends: {
+    friendList: [],
+    friendRequests: [],
+  },
+};
 module.exports = { authRoutes: router };
