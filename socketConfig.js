@@ -9,15 +9,16 @@ function connectSocket(server) {
   });
 
   io.on("connection", (socket) => {
-    console.log("User connected with id: " + socket.id);
-    socket.on("join_room", (data) => {
-      socket.join(data.roomId);
-      socket.username = data.name;
-      socket.chatroom = data.roomId;
-      console.log("User: " + data.name + " joined room: " + data.roomId);
-    });
-    socket.on("leave_room", (data) => {
-      socket.leave(data);
+    //console.log("User connected with id: " + socket.id);
+
+    socket.on("connect-users", (data) => {
+      const {
+        emittedUserObj: { username, connectionId },
+      } = data;
+      socket.join(connectionId);
+      socket.username = username;
+      socket.chatroom = connectionId;
+      console.log("User: " + username + " joined room: " + connectionId);
     });
 
     socket.on("disconnect", () => {

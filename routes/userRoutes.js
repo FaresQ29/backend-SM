@@ -93,13 +93,13 @@ router.put("/remove-friend/", async (req, res) => {
   try {
     const { otherUserId, user } = req.body;
     const userCopy = structuredClone(user);
-    console.log(userCopy);
-
     let relId = null;
     userCopy.friends.friendList = userCopy.friends.friendList.filter((elem) => {
-      if (elem.userId.toString() === otherUserId) {
-        relId = elem.relId;
+      if (elem.userId.toString() !== otherUserId) {
         return elem;
+      } else {
+        relId = elem.relId;
+        return;
       }
     });
 
