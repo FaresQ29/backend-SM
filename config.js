@@ -25,11 +25,11 @@ function middleWareConfig(app) {
 }
 
 //connect to mongoose
-async function mongoConnect(app) {
+async function mongoConnect(server) {
   try {
     const response = await mongoose.connect(mongoServer);
     console.log("Connected to mongoose");
-    app.listen(PORT, () => {
+    server.listen(PORT, () => {
       console.log("Listening");
     });
   } catch (err) {

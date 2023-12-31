@@ -7,7 +7,12 @@ const userSchema = new Schema({
   password: { type: String, required: true },
   email: { type: String, unique: true },
   friends: {
-    friendList: [{ type: Schema.Types.ObjectId, ref: "User" }],
+    friendList: [
+      {
+        userId: { type: Schema.Types.ObjectId, ref: "User" },
+        relId: { type: Schema.Types.ObjectId, ref: "Relation" },
+      },
+    ],
     friendRequests: [{ type: Schema.Types.ObjectId, ref: "User" }],
   },
   userDetails: {

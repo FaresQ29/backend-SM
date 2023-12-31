@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/user.model");
+const Relation = require("../models/relation.model.js");
 const { url } = require("../config.js");
 const checkToken = require("../middleware/checkToken");
 
@@ -45,16 +46,26 @@ router.put("/accept-friend/", async (req, res) => {
   const { otherUserId, user } = req.body;
 
   try {
+    //create relationship (used for socket)
+    const relation = await Relation.create({
+      userList: [user._id, otherUserId],
+    });
+
     const userCopy = structuredClone(user);
-    userCopy.friends.friendList.push(otherUserId);
+    userCopy.friends.friendList.push({
+      userId: otherUserId,
+      relId: relation._id,
+    });
     userCopy.friends.friendRequests = userCopy.friends.friendRequests.filter(
       (id) => id !== otherUserId
     );
     await User.findByIdAndUpdate(user._id, userCopy);
 
     const findOtherUser = await User.findById(otherUserId);
-    findOtherUser.friends.friendList.push(user._id);
-
+    findOtherUser.friends.friendList.push({
+      userId: user._id,
+      relId: relation._id,
+    });
     await User.findByIdAndUpdate(otherUserId, findOtherUser);
     res.status(201).json({ msg: "Successfully accepted friend request" });
   } catch (err) {
@@ -82,16 +93,23 @@ router.put("/remove-friend/", async (req, res) => {
   try {
     const { otherUserId, user } = req.body;
     const userCopy = structuredClone(user);
-    userCopy.friends.friendList = userCopy.friends.friendList.filter(
-      (id) => id !== otherUserId
-    );
-    await User.findByIdAndUpdate(user._id, userCopy);
+    console.log(userCopy);
 
+    let relId = null;
+    userCopy.friends.friendList = userCopy.friends.friendList.filter((elem) => {
+      if (elem.userId.toString() === otherUserId) {
+        relId = elem.relId;
+        return elem;
+      }
+    });
+
+    await User.findByIdAndUpdate(user._id, userCopy);
     const otherUser = await User.findById(otherUserId);
     otherUser.friends.friendList = otherUser.friends.friendList.filter(
-      (id) => id.toString() !== user._id
+      (elem) => elem.userId.toString() !== user._id
     );
     await User.findByIdAndUpdate(otherUserId, otherUser);
+    await Relation.findByIdAndDelete(relId);
     res.status(201).json({ msg: "Successfully removed friend" });
   } catch (err) {
     res.status(500).json({ msg: "Server error. Could not remove friend." });

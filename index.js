@@ -1,13 +1,16 @@
 require("dotenv").config();
 const express = require("express");
 const app = express();
+const http = require("http");
+const server = http.createServer(app);
 
 const { middleWareConfig, mongoConnect } = require("./config.js");
-
+const { connectSocket } = require("./socketConfig.js");
 //for configuration:
 middleWareConfig(app);
 //connect to mongo db and listen
-mongoConnect(app);
+mongoConnect(server);
+connectSocket(server);
 
 app.get("/test", (req, res) => {
   res.send("verified!");
