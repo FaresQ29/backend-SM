@@ -42,13 +42,24 @@ router.post("/add-friend/:id", async (req, res) => {
   }
 });
 //accepts a friend
-router.put("/accept-friend/", async (req, res) => {
-  const { otherUserId, user } = req.body;
 
+function createRelationObj(user) {
+  return {
+    userId: user._id,
+    username: user.username,
+  };
+}
+
+router.put("/accept-friend/", async (req, res) => {
+  const { otherUser, user } = req.body;
+  const otherUserId = otherUser._id;
+  const userObj = createRelationObj(user);
+  const otherUserObj = createRelationObj(otherUser);
   try {
     //create relationship (used for socket)
     const relation = await Relation.create({
-      userList: [user._id, otherUserId],
+      userList: [userObj, otherUserObj],
+      chatLogs: [],
     });
 
     const userCopy = structuredClone(user);
@@ -59,8 +70,7 @@ router.put("/accept-friend/", async (req, res) => {
     userCopy.friends.friendRequests = userCopy.friends.friendRequests.filter(
       (id) => id !== otherUserId
     );
-    await User.findByIdAndUpdate(user._id, userCopy);
-
+    const response = await User.findByIdAndUpdate(user._id, userCopy);
     const findOtherUser = await User.findById(otherUserId);
     findOtherUser.friends.friendList.push({
       userId: user._id,
@@ -94,8 +104,9 @@ router.put("/remove-friend/", async (req, res) => {
     const { otherUserId, user } = req.body;
     const userCopy = structuredClone(user);
     let relId = null;
+
     userCopy.friends.friendList = userCopy.friends.friendList.filter((elem) => {
-      if (elem.userId.toString() !== otherUserId) {
+      if (elem.userId._id.toString() !== otherUserId) {
         return elem;
       } else {
         relId = elem.relId;
@@ -112,6 +123,7 @@ router.put("/remove-friend/", async (req, res) => {
     await Relation.findByIdAndDelete(relId);
     res.status(201).json({ msg: "Successfully removed friend" });
   } catch (err) {
+    console.log(err);
     res.status(500).json({ msg: "Server error. Could not remove friend." });
   }
 });

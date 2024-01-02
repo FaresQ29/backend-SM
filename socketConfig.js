@@ -3,7 +3,7 @@ const { Server } = require("socket.io");
 function connectSocket(server) {
   const io = new Server(server, {
     cors: {
-      origin: "http://localhost:5173",
+      origin: process.env.FRONTEND_URL,
       methods: ["GET", "POST", "PUT"],
     },
   });
@@ -20,10 +20,16 @@ function connectSocket(server) {
       socket.chatroom = connectionId;
       console.log("User: " + username + " joined room: " + connectionId);
     });
-
+    socket.on("send_message", (msgData) => {
+      //socket.broadcast.emit("receive_message", msgData);
+      io.to(msgData.currentRoom).emit("receive_message", msgData);
+    });
     socket.on("disconnect", () => {
       io.emit("user disconnected");
-      // socket.broadcast.to(socket.chatroom).emit('user disconnect', socket.username);
+
+      socket.broadcast
+        .to(socket.chatroom)
+        .emit("user disconnect", socket.username);
       console.log("User disconnected...");
     });
   });

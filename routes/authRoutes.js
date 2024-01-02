@@ -4,6 +4,7 @@ const User = require("../models/user.model");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const checkToken = require("../middleware/checkToken");
+const mongoose = require("mongoose");
 //app.use("/auth", authRoutes);
 //to set the token expiry to 14 days
 const maxAge = 14 * 24 * 60 * 60;
@@ -54,7 +55,6 @@ router.post("/register", async (req, res, next) => {
       friendDefaultValues
     );
 
-    console.log(formObj);
     if (email) {
       formObj.email = email;
     }
@@ -125,7 +125,17 @@ router.post("/login", async (req, res, next) => {
 router.get("/verify", checkToken, async (req, res, next) => {
   const { id } = req.payload;
   try {
-    const user = await User.findById(id);
+    const user = await User.findById(id).populate({
+      path: "friends",
+      populate: {
+        path: "friendList",
+        populate: {
+          path: "userId",
+          model: "User",
+          select: "-password -friends.friendRequests",
+        },
+      },
+    });
     res.status(200).json({ token: req.token, user });
   } catch (err) {
     res.status(409).json({ msg: "Could not verify user token." });

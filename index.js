@@ -27,3 +27,7 @@ app.use("/user", userRoutes);
 //Image Routes
 const { imageRoutes } = require("./routes/imageRoutes");
 app.use("/image", imageRoutes);
+
+//DM Routes
+const { dmRoutes } = require("./routes/dmRoutes");
+app.use("/dm", dmRoutes);

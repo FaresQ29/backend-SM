@@ -13,8 +13,8 @@ const dbConfig = {
 
 const PORT = process.env.PORT;
 
-// const url = `http://localhost:${PORT}`;
-const url = `http://192.168.1.68:${PORT}`;
+const url = `http://localhost:${PORT}`;
+//const url = `http://192.168.1.68:${PORT}`;
 
 // Middleware configuration
 function middleWareConfig(app) {
