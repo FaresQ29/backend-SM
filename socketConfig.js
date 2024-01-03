@@ -20,9 +20,10 @@ function connectSocket(server) {
       socket.chatroom = connectionId;
       console.log("User: " + username + " joined room: " + connectionId);
     });
+
     socket.on("send_message", (msgData) => {
-      //socket.broadcast.emit("receive_message", msgData);
       io.to(msgData.currentRoom).emit("receive_message", msgData);
+      io.to(msgData.currentRoom).emit("receive_open_chat", msgData);
     });
     socket.on("disconnect", () => {
       io.emit("user disconnected");
