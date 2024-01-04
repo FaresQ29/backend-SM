@@ -129,11 +129,17 @@ router.get("/verify", checkToken, async (req, res, next) => {
       path: "friends",
       populate: {
         path: "friendList",
-        populate: {
-          path: "userId",
-          model: "User",
-          select: "-password -friends.friendRequests",
-        },
+        populate: [
+          {
+            path: "userId",
+            model: "User",
+            select: "-password -friends.friendRequests",
+          },
+          {
+            path: "relId",
+            model: "Relation",
+          },
+        ],
       },
     });
     res.status(200).json({ token: req.token, user });

@@ -16,18 +16,23 @@ router.get("/get-relations/:id", async (req, res) => {
         },
       },
     });
-
     res.status(200).json(response);
   } catch (error) {}
 });
-router.post("/post", async (req, res) => {
+router.get("/get-relation/:id", async (req, res) => {
+  const id = req.params.id;
   try {
-    const response = await Relation.findByIdAndUpdate(req.body._id, req.body);
-    const data = await Relation.findById(req.body._id);
-    res.status(200).json(data);
-  } catch (error) {
-    console.log(err);
-  }
+    const response = await Relation.findById(id);
+    res.status(200).json(response);
+  } catch (error) {}
+});
+router.put("/post-chat/", async (req, res) => {
+  console.log(req.body);
+  try {
+    await Relation.findByIdAndUpdate(req.body._id, req.body);
+    const response = await Relation.findById(req.body._id);
+    res.status(200).json(response);
+  } catch (error) {}
 });
 
 module.exports = { dmRoutes: router };

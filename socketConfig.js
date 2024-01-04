@@ -22,8 +22,7 @@ function connectSocket(server) {
     });
 
     socket.on("send_message", (msgData) => {
-      io.to(msgData.currentRoom).emit("receive_message", msgData);
-      io.to(msgData.currentRoom).emit("receive_open_chat", msgData);
+      io.to(msgData.roomId).emit("receive_message", msgData);
     });
     socket.on("disconnect", () => {
       io.emit("user disconnected");
