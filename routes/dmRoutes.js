@@ -27,7 +27,6 @@ router.get("/get-relation/:id", async (req, res) => {
   } catch (error) {}
 });
 router.put("/post-chat/", async (req, res) => {
-  console.log(req.body);
   try {
     await Relation.findByIdAndUpdate(req.body._id, req.body);
     const response = await Relation.findById(req.body._id);
